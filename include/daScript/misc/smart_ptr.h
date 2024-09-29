@@ -7,7 +7,7 @@
 #if DAS_SMART_PTR_TRACKER
 #include <atomic>
 #endif
-
+#include <daScript/das_config.h>
 void os_debug_break();
 
 namespace das {
@@ -355,6 +355,54 @@ namespace das {
 
     class ptr_ref_count {
     public:
+    static void *operator new(
+        size_t size) noexcept {
+        return das_aligned_alloc16(size);
+    }
+    static void *operator new(
+        size_t,
+        void *place) noexcept {
+        return place;
+    }
+    static void *operator new[](
+        size_t size) noexcept {
+        return das_aligned_alloc16(size);
+    }
+    static void *operator new(
+        size_t size, const std::nothrow_t &) noexcept {
+        return das_aligned_alloc16(size);
+    }
+    static void *operator new(
+        size_t,
+        void *place, const std::nothrow_t &) noexcept {
+        return place;
+    }
+    static void *operator new[](
+        size_t size, const std::nothrow_t &) noexcept {
+        return das_aligned_alloc16(size);
+    }
+    static void operator delete(
+        void *pdead) noexcept {
+        das_aligned_free16(pdead);
+    }
+    static void operator delete(
+        void *ptr,
+        void *place) noexcept {
+        // do nothing
+    }
+    static void operator delete[](
+        void *pdead) noexcept {
+        das_aligned_free16(pdead);
+    }
+    static void operator delete(
+        void *pdead, size_t) noexcept {
+        das_aligned_free16(pdead);
+    }
+    static void operator delete[](
+        void *pdead, size_t) noexcept {
+        das_aligned_free16(pdead);
+    }
+
 #if DAS_SMART_PTR_ID
         uint64_t                    ref_count_id;
         static uint64_t             ref_count_total;

@@ -283,8 +283,18 @@ namespace das
         __forceinline bool isImplicit() const { return flags & flag_isImplicit; }
         __forceinline bool isSmartPtr() const { return flags & flag_isSmartPtr; }
         TypeAnnotation * getAnnotation() const;
-        StructInfo * getStructType() const;
-        EnumInfo * getEnumType() const;
+        StructInfo * getStructType() const{
+            if ( type != Type::tStructure ) [[unlikely]] {
+                return nullptr;
+            }
+            return structType;
+        }
+        EnumInfo * getEnumType() const{
+            if ( type != Type::tEnumeration && type != Type::tEnumeration8 && type != Type::tEnumeration16 ) [[unlikely]] {
+                return nullptr;
+            }
+            return enumType;
+        }
         void resolveAnnotation() const;
     };
 

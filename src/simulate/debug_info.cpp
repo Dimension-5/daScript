@@ -7,6 +7,8 @@
 #include "daScript/misc/arraytype.h"
 #include "daScript/misc/vectypes.h"
 #include "daScript/misc/rangetype.h"
+#include "daScript/misc/sysos.h"
+#include <filesystem>
 
 namespace das
 {
@@ -66,19 +68,6 @@ namespace das
             return nullptr;
         }
         return Module::resolveAnnotation(this);
-    }
-
-    StructInfo * TypeInfo::getStructType() const {
-        if ( type != Type::tStructure ) {
-            return nullptr;
-        }
-        return structType;
-    }
-    EnumInfo * TypeInfo::getEnumType() const {
-        if ( type != Type::tEnumeration && type != Type::tEnumeration8 && type != Type::tEnumeration16 && type != Type::tEnumeration64 ) {
-            return nullptr;
-        }
-        return enumType;
     }
 
     void TypeInfo::resolveAnnotation() const {
@@ -757,21 +746,22 @@ namespace das
     }
 
     bool FileAccess::isSameFileName ( const string & a, const string & b ) const {
-        if ( a.size() != b.size() ) return false;
-        auto it_a = a.begin();
-        auto it_b = b.begin();
-        while ( it_a != a.end() ) {
-            bool isSlahA = *it_a=='\\' || *it_a=='/';
-            bool isSlahB = *it_b=='\\' || *it_b=='/';
-            if ( isSlahA != isSlahB ) {
-                return false;
-            } else if ( !isSlahA && (tolower(*it_a) != tolower(*it_b)) ) {
-                return false;
-            }
-            ++it_a;
-            ++it_b;
-        }
-        return true;
+        return std::filesystem::path(a).lexically_normal() == std::filesystem::path(b).lexically_normal();
+        // if ( a.size() != b.size() ) return false;
+        // auto it_a = a.begin();
+        // auto it_b = b.begin();
+        // while ( it_a != a.end() ) {
+        //     bool isSlahA = *it_a=='\\' || *it_a=='/';
+        //     bool isSlahB = *it_b=='\\' || *it_b=='/';
+        //     if ( isSlahA != isSlahB ) {
+        //         return false;
+        //     } else if ( !isSlahA && (tolower(*it_a) != tolower(*it_b)) ) {
+        //         return false;
+        //     }
+        //     ++it_a;
+        //     ++it_b;
+        // }
+        // return true;
     }
 
     FileInfoPtr FileAccess::letGoOfFileInfo ( const string & fileName ) {
@@ -812,14 +802,27 @@ namespace das
     }
 
     string FileAccess::getIncludeFileName ( const string & fileName, const string & incFileName ) const {
-        auto np = fileName.find_last_of("\\/");
+        auto first_pos = incFileName.find_first_of("\\/");
+        if(first_pos != string::npos){
+            std::string_view first_dir_name{incFileName.data(), first_pos};
+            if(first_dir_name == "DASROOT"){
+                // TODO: @Maxwell hard code here, very bad, any better idea?
+                string path;
+                if(getDasRoot().empty()){
+                    path = "scripts";
+                } else {
+                    path = getDasRoot() + "/scripts";
+                }
+                return std::filesystem::path{path + string{incFileName.data() + first_pos, incFileName.size() - first_pos}}.lexically_normal().string();
+            }
+        }
+        auto np = fileName.find_last_of("\\/");        
         if ( np != string::npos ) {
-            return fileName.substr(0,np+1) + incFileName;
+            return (std::filesystem::path{fileName.substr(0,np+1) + incFileName}).lexically_normal().string();
         } else {
-            return incFileName;
+            return (std::filesystem::path{incFileName}).lexically_normal().string();
         }
     }
-
     ModuleInfo FileAccess::getModuleInfo ( const string & req, const string & from ) const {
         auto mod = getModuleName(req);
         string modFName = getModuleFileName(req);

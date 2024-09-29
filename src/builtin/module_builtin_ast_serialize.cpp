@@ -61,7 +61,8 @@ namespace das {
         for ( auto & p : refs ) {
             auto it = objects.find(p.second);
             if ( it == objects.end() ) {
-                throw std::runtime_error{"ast serializer function ref not found"};
+                std::cerr << "ast serializer function ref not found\n";
+                std::abort();
             } else {
                 *p.first = it->second.get();
             }
@@ -77,8 +78,8 @@ namespace das {
         vsnprintf(err, 256, fmt, args);
 
         va_end(args);
-
-        throw std::runtime_error{err};
+        std::cerr << err << "\n";
+        std::abort();
     }
 
     #define SERIALIZER_VERIFYF(cond, ...) {                 \
@@ -135,13 +136,8 @@ namespace das {
     }
 
     ___noinline bool AstSerializer::trySerialize ( const callable<void(AstSerializer&)> &cb ) noexcept {
-        try {
-            cb(*this);
-            return true;
-        } catch ( const std::runtime_error & e ) {
-            failed = true;
-            return false;
-        }
+        cb(*this);
+        return true;
     }
 
     // copied hash_blockz64 from mics/anyhash.h to avoid binary incompatible changes
@@ -296,7 +292,7 @@ namespace das {
 
     template <typename K, typename V>
     AstSerializer & AstSerializer::operator << ( das_hash_map<K, V> & value ) {
-        serialize_hash_map<K, V, hash<K>, equal_to<K>>(value);
+        serialize_hash_map<K, V, das::hash<K>, equal_to<K>>(value);
         return *this;
     }
 
@@ -1338,7 +1334,7 @@ namespace das {
             }
             ser << mangledName;
             if ( annotation != nullptr && annotation->getFieldOffset(name) == -1 ) {
-                LOG(LogLevel::warning) << "Field '" << name << "' not found in '" << annotation->name << "'";
+                LOG(LogLevel::error) << "Field '" << name << "' not found in '" << annotation->name << "'";
             }
         } else {
             if ( annotation != nullptr && annotation->getFieldOffset(name) == -1 ) {
@@ -1567,7 +1563,7 @@ namespace das {
     }
 
     void MakeStruct::serialize( AstSerializer & ser ) {
-        ser << static_cast <vector<MakeFieldDeclPtr> &> ( *this );
+        ser << static_cast <das::vector<MakeFieldDeclPtr> &> ( *this );
         ptr_ref_count::serialize(ser);
     }
 
@@ -2177,15 +2173,9 @@ namespace das {
                     continue;
                 }
 
-                try {
-                    auto deser = new Module();
-                    program->library.addModule(deser);
-                    ser << *deser;
-                } catch ( std::runtime_error & r ) {
-                    LOG(LogLevel::warning) << r.what();
-                    program->failToCompile = true;
-                    return;
-                }
+                auto deser = new Module();
+                program->library.addModule(deser);
+                ser << *deser;
             }
 
             program->thisModule.reset(program->library.getModules().back());
@@ -2193,20 +2183,14 @@ namespace das {
     }
 
     uint32_t AstSerializer::getVersion () {
-        static constexpr uint32_t currentVersion = 36;
+        static constexpr uint32_t currentVersion = 35;
         return currentVersion;
     }
 
     // Serializes the whole script as opposed to just one module
     bool AstSerializer::serializeScript ( ProgramPtr program ) noexcept {
-        try {
-            program->serialize(*this);
-            return true;
-        } catch ( std::runtime_error & r ) {
-            program->failToCompile = true;
-            LOG(LogLevel::warning) << r.what();
-            return false;
-        }
+        program->serialize(*this);
+        return true;
     }
 
     // Used in daNetGame currently

@@ -606,8 +606,8 @@ public:
         for (EntryPointer it = new_buckets; it != special_end_item; ++it)
             it->distance_from_desired = -1;
         special_end_item->distance_from_desired = Entry::special_end_value;
-        das::swap(entries, new_buckets);
-        das::swap(num_slots_minus_one, num_buckets);
+        std::swap(entries, new_buckets);
+        std::swap(num_slots_minus_one, num_buckets);
         --num_slots_minus_one;
         hash_policy.commit(new_prime_index);
         int8_t old_max_lookups = max_lookups;
@@ -704,7 +704,7 @@ public:
 
     void swap(sherwood_v3_table & other)
     {
-        using das::swap;
+        using std::swap;
         swap_pointers(other);
         swap(static_cast<ArgumentHash &>(*this), static_cast<ArgumentHash &>(other));
         swap(static_cast<ArgumentEqual &>(*this), static_cast<ArgumentEqual &>(other));
@@ -779,9 +779,9 @@ private:
 
     void swap_pointers(sherwood_v3_table & other)
     {
-        using das::swap;
+        using std::swap;
         swap(hash_policy, other.hash_policy);
-        swap(entries, other.entries);
+        std::swap(entries, other.entries);
         swap(num_slots_minus_one, other.num_slots_minus_one);
         swap(num_elements, other.num_elements);
         swap(max_lookups, other.max_lookups);
@@ -791,7 +791,7 @@ private:
     template<typename Key, typename... Args>
     SKA_NOINLINE(das::pair<iterator, bool>) emplace_new_key(int8_t distance_from_desired, EntryPointer current_entry, Key && key, Args &&... args)
     {
-        using das::swap;
+        using std::swap;
         if (num_slots_minus_one == 0 || distance_from_desired == max_lookups || num_elements + 1 > (num_slots_minus_one + 1) * static_cast<double>(_max_load_factor))
         {
             grow();
@@ -805,7 +805,7 @@ private:
         }
         value_type to_insert(das::forward<Key>(key), das::forward<Args>(args)...);
         swap(distance_from_desired, current_entry->distance_from_desired);
-        swap(to_insert, current_entry->value);
+        std::swap(to_insert, current_entry->value);
         iterator result = { current_entry };
         for (++distance_from_desired, ++current_entry;; ++current_entry)
         {
@@ -818,7 +818,7 @@ private:
             else if (current_entry->distance_from_desired < distance_from_desired)
             {
                 swap(distance_from_desired, current_entry->distance_from_desired);
-                swap(to_insert, current_entry->value);
+                std::swap(to_insert, current_entry->value);
                 ++distance_from_desired;
             }
             else
@@ -826,7 +826,7 @@ private:
                 ++distance_from_desired;
                 if (distance_from_desired == max_lookups)
                 {
-                    swap(to_insert, result.current->value);
+                    std::swap(to_insert, result.current->value);
                     grow();
                     return emplace(das::move(to_insert));
                 }
@@ -948,7 +948,7 @@ private:
     int8_t shift = 63;
 };
 
-template<typename K, typename V, typename H = das::hash<K>, typename E = das::equal_to<K>, typename A = das::allocator<das::pair<K, V> > >
+template<typename K, typename V, typename H = das::hash<K>, typename E = das::equal_to<K>, typename A = das::das_allocator<das::pair<K, V> > >
 class flat_hash_map
         : public detailv3::sherwood_v3_table
         <
@@ -1065,7 +1065,7 @@ private:
     };
 };
 
-template<typename T, typename H = das::hash<T>, typename E = das::equal_to<T>, typename A = das::allocator<T> >
+template<typename T, typename H = das::hash<T>, typename E = das::equal_to<T>, typename A = das::das_allocator<T> >
 class flat_hash_set
         : public detailv3::sherwood_v3_table
         <

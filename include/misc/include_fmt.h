@@ -7,5 +7,4 @@ namespace das {
 }
 #endif
 
-#include <fmt/core.h>
-#include <fmt/format.h>
+#include <spdlog/fmt/fmt.h>

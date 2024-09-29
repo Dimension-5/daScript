@@ -554,7 +554,7 @@ namespace das {
             vars->emplace_back(VariableNameAndPosition{varName,"",func->at});
             TypeDecl * funcType = new TypeDecl(Type::tFunction);
             funcType->at = func->at;
-            swap ( funcType->firstType, func->result );
+            std::swap ( funcType->firstType, func->result );
             funcType->argTypes.reserve ( func->arguments.size() );
             if ( yyextra->g_thisStructure->isClass ) {
                 auto selfType = make_smart<TypeDecl>(yyextra->g_thisStructure);

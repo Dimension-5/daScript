@@ -496,7 +496,6 @@ namespace das
         text << string(das::max(LCOL-COL,1),'^') << "\n";
         return text.str();
     }
-
     string to_cpp_double ( double val ) {
         if ( val==DBL_MIN ) return "DBL_MIN";
         else if ( val==-DBL_MIN ) return "(-DBL_MIN)";
@@ -504,7 +503,7 @@ namespace das
         else if ( val==-DBL_MAX ) return "(-DBL_MAX)";
         else {
             char buf[256];
-            auto result = fmt::format_to(buf, "{:e}", val);
+            auto result = das::format_to(buf, "{:e}", val);
             *result = 0;
             return buf;
         }
@@ -517,7 +516,7 @@ namespace das
         else if ( val==-FLT_MAX ) return "(-FLT_MAX)";
         else {
             char buf[256];
-            auto result = fmt::format_to(buf, "{:e}f", val);
+            auto result = das::format_to(buf, "{:e}f", val);
             *result = 0;
             return buf;
         }

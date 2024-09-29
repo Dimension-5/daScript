@@ -553,29 +553,30 @@ namespace das {
     }
 
     string getDasRoot ( void ) {
-        if ( g_dasRoot.empty() ) {
-            string efp = getExecutableFileName();   // ?/bin/debug/binary.exe
-            auto np = efp.find_last_of("\\/");
-            if ( np != string::npos ) {
-                auto ep = get_prefix(efp);          // remove file name
-                auto suffix = get_suffix(ep);
-                if ( suffix != "bin" ) {
-                    ep = get_prefix(ep);            // remove debug
-                }
-                if ( get_suffix(ep)!="bin" ) {
-                    g_dasRoot = ".";
-                } else {
-                    g_dasRoot = get_prefix(ep);     // remove bin
-                }
-                #ifdef DAS_INSTALL_BINDIR
-                if ( ep == DAS_INSTALL_BINDIR ) {
-                    g_dasRoot = DAS_INSTALL_DATADIR;
-                }
-                #endif
-            } else {
-                g_dasRoot = ".";
-            }
-        }
         return g_dasRoot;
+        // if ( g_dasRoot.empty() ) {
+        //     string efp = getExecutableFileName();   // ?/bin/debug/binary.exe
+        //     auto np = efp.find_last_of("\\/");
+        //     if ( np != string::npos ) {
+        //         auto ep = get_prefix(efp);          // remove file name
+        //         auto suffix = get_suffix(ep);
+        //         if ( suffix != "bin" ) {
+        //             ep = get_prefix(ep);            // remove debug
+        //         }
+        //         if ( get_suffix(ep)!="bin" ) {
+        //             g_dasRoot = ".";
+        //         } else {
+        //             g_dasRoot = get_prefix(ep);     // remove bin
+        //         }
+        //         #ifdef DAS_INSTALL_BINDIR
+        //         if ( ep == DAS_INSTALL_BINDIR ) {
+        //             g_dasRoot = DAS_INSTALL_DATADIR;
+        //         }
+        //         #endif
+        //     } else {
+        //         g_dasRoot = ".";
+        //     }
+        // }
+        // return g_dasRoot;
     }
 }

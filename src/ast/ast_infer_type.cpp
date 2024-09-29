@@ -7168,7 +7168,7 @@ namespace das {
             if ( candidates.size()==1 ) {
                 return 0;
             }
-            sort(ranked.begin(), ranked.end(), [](const pair<Function *,int> & a, const pair<Function *,int> & b) {
+            das::sort(ranked.begin(), ranked.end(), [](const pair<Function *,int> & a, const pair<Function *,int> & b) {
                 return a.second < b.second;
             });
             // if there is one or more 'one-off's' - we only leave them
@@ -7681,7 +7681,7 @@ namespace das {
                 auto dist = computeSubstituteDistance(arguments, fn);
                 fnm.push_back(make_pair(dist,fn));
             }
-            sort ( fnm.begin(), fnm.end(), [&] ( auto a, auto b ) {
+            das::sort ( fnm.begin(), fnm.end(), [&] ( auto a, auto b ) {
                 return a.first < b.first;
             });
             int count = 1;
@@ -9139,7 +9139,7 @@ namespace das {
             library.foreach(modMacro, "*");
             if ( log ) {
                 logs << "PASS " << pass << ":\n" << *this;
-                sort(errors.begin(), errors.end());
+                das::sort(errors.begin(), errors.end());
                 for (auto & err : errors) {
                     logs << reportError(err.at, err.what, err.extra, err.fixme, err.cerr);
                 }

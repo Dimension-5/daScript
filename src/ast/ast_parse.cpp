@@ -445,7 +445,7 @@ namespace das {
         if ( err || program->failed() ) {
             daScriptEnvironment::bound->g_Program.reset();
             daScriptEnvironment::bound->g_compilerLog = nullptr;
-            sort(program->errors.begin(),program->errors.end());
+            das::sort(program->errors.begin(),program->errors.end());
             program->isCompiling = false;
             return program;
         } else {
@@ -503,7 +503,7 @@ namespace das {
                 }
             }
             daScriptEnvironment::bound->g_compilerLog = nullptr;
-            sort(program->errors.begin(), program->errors.end());
+            das::sort(program->errors.begin(), program->errors.end());
             program->isCompiling = false;
             if ( !program->failed() ) {
                 if ( program->needMacroModule ) {
@@ -582,7 +582,7 @@ namespace das {
         if ( !program->thisModule->name.empty() )
             return true;
         program->error("Module " + mod.moduleName + " is not setup correctly for AOT",
-            "module " + mod.moduleName + " is required", "", LineInfo(),
+            "did you forget add 'module " + mod.moduleName +"' declaration in file?", "", LineInfo(),
                 CompilationError::module_does_not_have_a_name);
         return false;
     }

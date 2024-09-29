@@ -296,39 +296,20 @@ void os_debug_break();
 
 #ifndef DAS_ALIGNED_ALLOC
 #define DAS_ALIGNED_ALLOC 1
-inline void *das_aligned_alloc16(size_t size) {
-#if defined(_MSC_VER)
-    return _aligned_malloc(size, 16);
-#else
-    void * mem = nullptr;
-    if (posix_memalign(&mem, 16, size)) {
-        DAS_ASSERTF(0, "posix_memalign returned nullptr");
-        return nullptr;
-    }
-    return mem;
-#endif
-}
-inline void das_aligned_free16(void *ptr) {
-#if defined(_MSC_VER)
-    _aligned_free(ptr);
-#else
-    free(ptr);
-#endif
-}
+void *das_aligned_alloc16(size_t size);
+void das_aligned_free16(void *ptr);
+void das_init_default_memfunc();
+void das_set_memfunc(
+    void*(*alloc16)(size_t),
+    void(*free16)(void* ptr),
+    size_t(*mem_size)(void* ptr)
+);
 #if defined(__APPLE__)
 #include <malloc/malloc.h>
 #elif defined (__linux__) || defined (_EMSCRIPTEN_VER) || defined __HAIKU__
 #include <malloc.h>
 #endif
-inline size_t das_aligned_memsize(void * ptr){
-#if defined(_MSC_VER)
-    return _aligned_msize(ptr, 16, 0);
-#elif defined(__APPLE__)
-    return malloc_size(ptr);
-#else
-    return malloc_usable_size(ptr);
-#endif
-}
+size_t das_aligned_memsize(void * ptr);
 #endif
 
 // when enabled, Context heap memory will track where the allocation came from

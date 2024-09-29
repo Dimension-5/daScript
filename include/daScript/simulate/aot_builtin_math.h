@@ -215,4 +215,9 @@ namespace das {
     __forceinline float4 unpack_byte_to_float ( uint32_t value ) {
         return v_byte_to_float(value);
     }
+    float das_fmod_float(float l, float r);
+    float2 das_fmod_float2(float2 l, float2 r);
+    float3 das_fmod_float3(float3 l, float3 r);
+    float4 das_fmod_float4(float4 l, float4 r);
+    double das_fmod(double l, double r);
 }

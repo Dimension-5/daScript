@@ -90,7 +90,7 @@ namespace das {
 
     bool JobQue::areJobsPending(JobCategory category) {
         lock_guard<mutex> lock(mFifoMutex);
-        if (find_if(mFifo.begin(), mFifo.end(), [=](const JobEntry& jobEntry) {
+        if (das::find_if(mFifo.begin(), mFifo.end(), [=](const JobEntry& jobEntry) {
                 return jobEntry.category == category; }) != mFifo.end()) {
             return true;
         }

@@ -3,7 +3,7 @@
 #include "daScript/simulate/fs_file_info.h"
 #include "daScript/misc/sysos.h"
 #include "daScript/ast/ast.h"
-
+#include <filesystem>
 #define DASLIB_MODULE_NAME  "daslib"
 #define DASTEST_MODULE_NAME "dastest"
 
@@ -14,6 +14,8 @@
 #if !defined(DAS_NO_FILEIO)
 #include <sys/stat.h>
 #endif
+
+#include <zlib/zlib.h>
 
 namespace das {
 #if !defined(DAS_NO_FILEIO)
@@ -43,13 +45,13 @@ namespace das {
 
     FileInfo * FsReadOnlyCachedFileSystem::tryOpenFile ( const string & fileName ) {
         lock_guard<mutex> guard(fsm);
-        // TODO: normalize fileName?
-        auto hname = hash64z(fileName.c_str());
+        auto normalized_fileName = std::filesystem::path(fileName).lexically_normal().string();
+        auto hname = das::hash_block64((uint8_t const*)normalized_fileName.data(), normalized_fileName.size());
         auto it_ok = files.insert(make_pair(hname, nullptr));
         auto & hfile = it_ok.first->second;
         if ( it_ok.second ) {
             // we inserted
-            if ( FILE * ff = fopen ( fileName.c_str(), "rb" ) ) {
+            if ( FILE * ff = fopen ( normalized_fileName.c_str(), "rb" ) ) {
                 struct stat st;
                 int fd = fileno((FILE *)ff);
                 fstat(fd, &st);
@@ -75,9 +77,10 @@ namespace das {
     }
 #endif
 
-    FsFileAccess::FsFileAccess()
+    FsFileAccess::FsFileAccess(bool add_default)
         : ModuleFileAccess() {
-        createFileSystems();
+        if (add_default)
+            createFileSystems();
     }
 
     FsFileAccess::FsFileAccess ( const string & pak, const FileAccessPtr & access )
@@ -135,7 +138,11 @@ namespace das {
             ModuleInfo info;
             if ( top==DASLIB_MODULE_NAME ) {
                 info.moduleName = mod_name;
-                info.fileName = getDasRoot() + "/" + DASLIB_MODULE_NAME + "/" + info.moduleName + ".das";
+                if(getDasRoot().empty()){
+                    info.fileName = string(DASLIB_MODULE_NAME) + "/" + info.moduleName + ".das";
+                } else{
+                    info.fileName = getDasRoot() + "/" + DASLIB_MODULE_NAME + "/" + info.moduleName + ".das";
+                }
                 return info;
             }
             #define NATIVE_MODULE(category, subdir_name, dir_name, das_name) \
@@ -144,7 +151,6 @@ namespace das {
                     info.fileName = getDasRoot() + "/modules/" + #dir_name + "/" + #subdir_name + "/" + #das_name + ".das"; \
                     return info; \
                 }
-            #include "modules/external_resolve.inc"
             #undef NATIVE_MODULE
             auto ert = extraRoots.find(top);
             if ( ert!=extraRoots.end() ) {
@@ -160,5 +166,33 @@ namespace das {
         }
         return FileAccess::getModuleInfo(req, from);
     }
+    struct EmbedFiles {
+        char const* data;
+        size_t size;
+        size_t uncompressed_size;
+    };
+    static das_hash_map<string, EmbedFiles> _embedFiles;
+    void EmbedFileSys::addChar(const string& fileName, char const* ptr, size_t uncompressed_size, size_t size){
+        string normalizedFileName = std::filesystem::path(fileName).lexically_normal().string();
+
+        _embedFiles.emplace(normalizedFileName, EmbedFiles{ptr, size, uncompressed_size});
+    }
+    FileInfo* EmbedFileSys::tryOpenFile(const string& fileName) {
+        string normalizedFileName = std::filesystem::path(fileName).lexically_normal().string();
+        auto iter = _embedFiles.find(normalizedFileName);
+        if(iter == _embedFiles.end()) {
+            return nullptr;
+        }
+        auto& v = iter->second;
+        auto uncumpressed_data = reinterpret_cast<char*>(das_aligned_alloc16(v.uncompressed_size));
+        uLongf destLen = v.uncompressed_size;
+        uncompress((Bytef *)uncumpressed_data, &destLen, (const Bytef*)v.data, v.size);
+        if(destLen != v.uncompressed_size) [[unlikely]] {
+            std::cerr << "Bad compressed data.\n";
+            std::abort();
+        }
+        return new TextFileInfo(uncumpressed_data, destLen, true);
+    }
+    EmbedCharArray const* EmbedCharArray::head = nullptr;
 }
 

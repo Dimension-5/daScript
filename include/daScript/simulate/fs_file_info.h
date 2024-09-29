@@ -10,6 +10,21 @@ namespace das {
         virtual FileInfo * tryOpenFile ( const string & fileName ) = 0;
     };
 
+    struct EmbedCharArray {
+        char const* path;
+        char const* data;
+        size_t compressed_size;
+        size_t size;
+        EmbedCharArray const* next;
+        static EmbedCharArray const* head;
+    };
+
+    class EmbedFileSys final : public AnyFileSystem {
+    public:
+        static void addChar(const string& fileName, char const* ptr, size_t uncompressed_size, size_t size);
+        FileInfo* tryOpenFile(const string& fileName) override;
+    };
+
 #if !DAS_NO_FILEIO
     class FsFileSystem : public AnyFileSystem {
     public:
@@ -28,7 +43,7 @@ namespace das {
 
     class FsFileAccess : public das::ModuleFileAccess {
     public:
-        FsFileAccess();
+        FsFileAccess ( bool add_default = true);
         FsFileAccess ( const string & pak, const FileAccessPtr & access );
         virtual ~FsFileAccess();
         virtual void createFileSystems();
