@@ -57,7 +57,7 @@ namespace das {
         // if(!aotLib.try_emplace(hash, std::move(func)).second){
         //     std::cerr << "Hash collided, try set aot lib failed.\n";
         // }
-        aotLib.emplace(hash, std::move(func));
+        aotLib.try_emplace(hash, std::move(func));
     }
     AotLibrary & getGlobalAotLibrary() {
         if ( !g_AOT_lib ) {

@@ -4412,7 +4412,7 @@ namespace das {
                     expr->func = inferFunctionCall(expr).get();
                     if ( !expr->func ) expr->name = saveName;
                 }
-                swap ( resultType, expr->type );
+                std::swap ( resultType, expr->type );
                 if ( expr->func ) {
                     if ( !expr->type->firstType->isSameType(*resultType, RefMatters::yes, ConstMatters::yes, TemporaryMatters::yes) ) {
                         error("initializer returns '" + describeType(resultType) + "' vs '"
@@ -9139,7 +9139,7 @@ namespace das {
             library.foreach(modMacro, "*");
             if ( log ) {
                 logs << "PASS " << pass << ":\n" << *this;
-                das::sort(errors.begin(), errors.end());
+                sort(errors.begin(), errors.end());
                 for (auto & err : errors) {
                     logs << reportError(err.at, err.what, err.extra, err.fixme, err.cerr);
                 }

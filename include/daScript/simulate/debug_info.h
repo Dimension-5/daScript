@@ -101,7 +101,7 @@ namespace das
         string      cppName;
     };
 
-    struct FileInfo {
+    struct FileInfo : public IOperatorNewBase {
     public:
         virtual void freeSourceData() { }
         virtual ~FileInfo() { freeSourceData(); }

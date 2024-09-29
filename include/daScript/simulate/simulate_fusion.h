@@ -20,7 +20,7 @@ namespace das {
 
     typedef das_hash_map<SimNode *,SimNodeInfo> SimNodeInfoLookup;
 
-    struct FusionPoint {
+    struct FusionPoint : public IOperatorNewBase {
         FusionPoint () {}
         virtual ~FusionPoint() {}
         virtual SimNode * fuse ( const SimNodeInfoLookup &, SimNode * node, Context * ) { return node; }

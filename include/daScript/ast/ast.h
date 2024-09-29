@@ -1059,7 +1059,7 @@ namespace das
 
     bool isValidBuiltinName ( const string & name, bool canPunkt = false );
 
-    class Module {
+    class Module : public IOperatorNewBase{
     public:
         Module ( const string & n = "" );
         void promoteToBuiltin(const FileAccessPtr & access);
@@ -1169,7 +1169,7 @@ namespace das
         vector<pair<string,bool>>                   keywords;           // keywords (and if they need oxford comma)
         vector<string>                              typeFunctions;      // type functions
         das_hash_map<string,Type>                   options;            // options
-        uint64_t                                    cumulativeHash = 0; // hash of all mangled names in this module (for builtin modules)
+        uint64_t                                    cumulativeHash = hash64_default_seed; // hash of all mangled names in this module (for builtin modules)
         string                                      name;
         string                                      fileName;           // where the module was found, if not built-in
         union {
@@ -1262,7 +1262,7 @@ namespace das
         Module *                        thisModule = nullptr;
     };
 
-    struct ModuleGroupUserData {
+    struct ModuleGroupUserData : public IOperatorNewBase {
         ModuleGroupUserData ( const string & n ) : name(n) {}
         virtual ~ModuleGroupUserData() {}
         string name;
@@ -1349,7 +1349,7 @@ namespace das
 
     class DebugInfoHelper : public ptr_ref_count {
     public:
-        DebugInfoHelper () { debugInfo = make_shared<DebugInfoAllocator>(); }
+        DebugInfoHelper (bool free_after_dispose = true) { debugInfo = make_shared<DebugInfoAllocator>(free_after_dispose); }
         DebugInfoHelper ( const shared_ptr<DebugInfoAllocator> & di ) : debugInfo(di) {}
     public:
         TypeInfo * makeTypeInfo ( TypeInfo * info, const TypeDeclPtr & type );

@@ -445,7 +445,7 @@ namespace das {
         if ( err || program->failed() ) {
             daScriptEnvironment::bound->g_Program.reset();
             daScriptEnvironment::bound->g_compilerLog = nullptr;
-            das::sort(program->errors.begin(),program->errors.end());
+            sort(program->errors.begin(),program->errors.end());
             program->isCompiling = false;
             return program;
         } else {
@@ -503,7 +503,7 @@ namespace das {
                 }
             }
             daScriptEnvironment::bound->g_compilerLog = nullptr;
-            das::sort(program->errors.begin(), program->errors.end());
+            sort(program->errors.begin(), program->errors.end());
             program->isCompiling = false;
             if ( !program->failed() ) {
                 if ( program->needMacroModule ) {

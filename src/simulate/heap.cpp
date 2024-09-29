@@ -114,7 +114,7 @@ namespace das {
                 for ( const auto & bpl : bytesPerLocation ) {
                     bplv.emplace_back(make_pair(bpl.second,bpl.first));
                 }
-                das::sort(bplv.begin(), bplv.end(), [&]( auto a, auto b){
+                sort(bplv.begin(), bplv.end(), [&]( auto a, auto b){
                     return a.first > b.first;
                 });
                 tout << "bytes per location:\n";

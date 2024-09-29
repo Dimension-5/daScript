@@ -83,11 +83,11 @@ namespace das {
     void Channel::pop ( const TBlock<void,void *> & blk, Context * context, LineInfoArg * at ) {
         while ( true ) {
             unique_lock<mutex> uguard(mCompleteMutex);
-            if ( !mCond.wait_for(uguard, chrono::milliseconds(mSleepMs), [&]() {
+            if ( !mCond.wait_for(uguard, std::chrono::milliseconds(mSleepMs), [&]() {
                 bool continue_waiting = (mRemaining>0) && pipe.empty();
                 return !continue_waiting;
             }) ) {
-                this_thread::yield();
+                std::this_thread::yield();
             } else {
                 break;
             }

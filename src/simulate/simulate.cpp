@@ -1790,7 +1790,7 @@ namespace das
         for ( auto & it : collector.allFiles ) {
             allFiles.push_back(it);
         }
-        das::sort ( allFiles.begin(), allFiles.end(), [&]( FileInfo * a, FileInfo * b ){
+        sort ( allFiles.begin(), allFiles.end(), [&]( FileInfo * a, FileInfo * b ){
             return a->name > b->name;
         });
         return allFiles;

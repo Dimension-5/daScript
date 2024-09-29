@@ -3,7 +3,7 @@
 #include "daScript/simulate/fs_file_info.h"
 #include "daScript/misc/sysos.h"
 #include "daScript/ast/ast.h"
-#include <filesystem>
+
 #define DASLIB_MODULE_NAME  "daslib"
 #define DASTEST_MODULE_NAME "dastest"
 
@@ -45,7 +45,7 @@ namespace das {
 
     FileInfo * FsReadOnlyCachedFileSystem::tryOpenFile ( const string & fileName ) {
         lock_guard<mutex> guard(fsm);
-        auto normalized_fileName = std::filesystem::path(fileName).lexically_normal().string();
+        auto normalized_fileName = std::filesystem::path(fileName).lexically_normal().string<char, std::char_traits<char>, eastl_allocator<char>>();
         auto hname = das::hash_block64((uint8_t const*)normalized_fileName.data(), normalized_fileName.size());
         auto it_ok = files.insert(make_pair(hname, nullptr));
         auto & hfile = it_ok.first->second;
@@ -173,12 +173,12 @@ namespace das {
     };
     static das_hash_map<string, EmbedFiles> _embedFiles;
     void EmbedFileSys::addChar(const string& fileName, char const* ptr, size_t uncompressed_size, size_t size){
-        string normalizedFileName = std::filesystem::path(fileName).lexically_normal().string();
+        string normalizedFileName = std::filesystem::path(fileName).lexically_normal().string<char, std::char_traits<char>, eastl_allocator<char>>();
 
         _embedFiles.emplace(normalizedFileName, EmbedFiles{ptr, size, uncompressed_size});
     }
     FileInfo* EmbedFileSys::tryOpenFile(const string& fileName) {
-        string normalizedFileName = std::filesystem::path(fileName).lexically_normal().string();
+        string normalizedFileName = std::filesystem::path(fileName).lexically_normal().string<char, std::char_traits<char>, eastl_allocator<char>>();
         auto iter = _embedFiles.find(normalizedFileName);
         if(iter == _embedFiles.end()) {
             return nullptr;

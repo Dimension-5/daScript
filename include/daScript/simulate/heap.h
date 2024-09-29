@@ -451,7 +451,7 @@ namespace das {
         bool prefixWithHeader = true;
         uint32_t totalNodesAllocated = 0;
     public:
-        NodeAllocator() {}
+        NodeAllocator(bool free_after_dispose = true) : LinearChunkAllocator(free_after_dispose){}
 
         /*
         * GCC really likes the version with separate if. CLANG \ MSVC strongly prefer the one bellow with __forceinline.
@@ -712,7 +712,7 @@ namespace das {
 
     class DebugInfoAllocator final : public NodeAllocator {
     public:
-        DebugInfoAllocator() {
+        DebugInfoAllocator(bool free_after_dispose = true): NodeAllocator(free_after_dispose) {
             prefixWithHeader = false;
             initialSize = 1024;
         }

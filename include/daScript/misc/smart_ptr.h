@@ -8,10 +8,12 @@
 #include <atomic>
 #endif
 #include <daScript/das_config.h>
+
 void os_debug_break();
 
 namespace das {
-
+    void das_free(void* ptr);
+    void* das_malloc(size_t size);
     struct AstSerializer;
 
     template<typename T, typename TP>
@@ -352,12 +354,11 @@ namespace das {
     #define DAS_SMART_PTR_NEW
     #define DAS_SMART_PTR_DELETE
 #endif
-
-    class ptr_ref_count {
+    class IOperatorNewBase{
     public:
     static void *operator new(
         size_t size) noexcept {
-        return das_aligned_alloc16(size);
+        return das_malloc(size);
     }
     static void *operator new(
         size_t,
@@ -366,11 +367,11 @@ namespace das {
     }
     static void *operator new[](
         size_t size) noexcept {
-        return das_aligned_alloc16(size);
+        return das_malloc(size);
     }
     static void *operator new(
         size_t size, const std::nothrow_t &) noexcept {
-        return das_aligned_alloc16(size);
+        return das_malloc(size);
     }
     static void *operator new(
         size_t,
@@ -379,11 +380,11 @@ namespace das {
     }
     static void *operator new[](
         size_t size, const std::nothrow_t &) noexcept {
-        return das_aligned_alloc16(size);
+        return das_malloc(size);
     }
     static void operator delete(
         void *pdead) noexcept {
-        das_aligned_free16(pdead);
+        das_free(pdead);
     }
     static void operator delete(
         void *ptr,
@@ -392,16 +393,20 @@ namespace das {
     }
     static void operator delete[](
         void *pdead) noexcept {
-        das_aligned_free16(pdead);
+        das_free(pdead);
     }
     static void operator delete(
         void *pdead, size_t) noexcept {
-        das_aligned_free16(pdead);
+        das_free(pdead);
     }
     static void operator delete[](
         void *pdead, size_t) noexcept {
-        das_aligned_free16(pdead);
+        das_free(pdead);
     }
+    };
+    class ptr_ref_count : public IOperatorNewBase{
+    public:
+    
 
 #if DAS_SMART_PTR_ID
         uint64_t                    ref_count_id;
@@ -487,7 +492,7 @@ namespace das {
     struct smart_ptr_hash {
         template<typename TT>
         std::size_t operator() ( const das::smart_ptr<TT> & k ) const {
-            return hash<void *>()(k.get());
+            return das_hash<void *>()(k.get());
         }
     };
 }

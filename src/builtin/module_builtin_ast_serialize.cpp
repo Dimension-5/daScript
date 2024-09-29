@@ -135,11 +135,6 @@ namespace das {
         }
     }
 
-    ___noinline bool AstSerializer::trySerialize ( const callable<void(AstSerializer&)> &cb ) noexcept {
-        cb(*this);
-        return true;
-    }
-
     // copied hash_blockz64 from mics/anyhash.h to avoid binary incompatible changes
     static uint64_t hash_tag ( const uint8_t * block ) {
         auto FNV_offset_basis = 14695981039346656037ul;
@@ -292,7 +287,7 @@ namespace das {
 
     template <typename K, typename V>
     AstSerializer & AstSerializer::operator << ( das_hash_map<K, V> & value ) {
-        serialize_hash_map<K, V, das::hash<K>, equal_to<K>>(value);
+        serialize_hash_map<K, V, das_hash<K>, equal_to<K>>(value);
         return *this;
     }
 
@@ -1563,7 +1558,7 @@ namespace das {
     }
 
     void MakeStruct::serialize( AstSerializer & ser ) {
-        ser << static_cast <das::vector<MakeFieldDeclPtr> &> ( *this );
+        ser << static_cast <vector<MakeFieldDeclPtr> &> ( *this );
         ptr_ref_count::serialize(ser);
     }
 

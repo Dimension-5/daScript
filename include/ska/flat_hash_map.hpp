@@ -948,7 +948,7 @@ private:
     int8_t shift = 63;
 };
 
-template<typename K, typename V, typename H = das::hash<K>, typename E = das::equal_to<K>, typename A = das::das_allocator<das::pair<K, V> > >
+template<typename K, typename V, typename H = das::hash<K>, typename E = das::equal_to<K>, typename A = das::allocator<das::pair<K, V> > >
 class flat_hash_map
         : public detailv3::sherwood_v3_table
         <
@@ -1065,7 +1065,7 @@ private:
     };
 };
 
-template<typename T, typename H = das::hash<T>, typename E = das::equal_to<T>, typename A = das::das_allocator<T> >
+template<typename T, typename H = das::hash<T>, typename E = das::equal_to<T>, typename A = das::allocator<T> >
 class flat_hash_set
         : public detailv3::sherwood_v3_table
         <

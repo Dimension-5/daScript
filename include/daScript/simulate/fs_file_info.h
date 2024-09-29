@@ -4,7 +4,7 @@
 
 namespace das {
 
-    class AnyFileSystem {
+    class AnyFileSystem : public IOperatorNewBase {
     public:
         virtual ~AnyFileSystem() {}
         virtual FileInfo * tryOpenFile ( const string & fileName ) = 0;

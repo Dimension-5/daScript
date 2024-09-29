@@ -8,7 +8,6 @@
 #include "daScript/misc/vectypes.h"
 #include "daScript/misc/rangetype.h"
 #include "daScript/misc/sysos.h"
-#include <filesystem>
 
 namespace das
 {
@@ -813,14 +812,14 @@ namespace das
                 } else {
                     path = getDasRoot() + "/scripts";
                 }
-                return std::filesystem::path{path + string{incFileName.data() + first_pos, incFileName.size() - first_pos}}.lexically_normal().string();
+                return std::filesystem::path{path + string{incFileName.data() + first_pos, incFileName.size() - first_pos}}.lexically_normal().string<char, std::char_traits<char>, eastl_allocator<char>>();;
             }
         }
         auto np = fileName.find_last_of("\\/");        
         if ( np != string::npos ) {
-            return (std::filesystem::path{fileName.substr(0,np+1) + incFileName}).lexically_normal().string();
+            return (std::filesystem::path{fileName.substr(0,np+1) + incFileName}).lexically_normal().string<char, std::char_traits<char>, eastl_allocator<char>>();
         } else {
-            return (std::filesystem::path{incFileName}).lexically_normal().string();
+            return (std::filesystem::path{incFileName}).lexically_normal().string<char, std::char_traits<char>, eastl_allocator<char>>();
         }
     }
     ModuleInfo FileAccess::getModuleInfo ( const string & req, const string & from ) const {

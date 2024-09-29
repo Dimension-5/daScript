@@ -591,7 +591,7 @@ namespace das {
             // macros
             auto ptm = program->thisModule.get();
             if ( ptm->macroContext ) {
-                swap ( macroContext, ptm->macroContext );
+                std::swap ( macroContext, ptm->macroContext );
                 ptm->handleTypes.foreach([&](auto fna){
                     addAnnotation(fna);
                 });

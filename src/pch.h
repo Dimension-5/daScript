@@ -6,4 +6,3 @@
 #include "daScript/misc/vectypes.h"
 #include "daScript/misc/type_name.h"
 #include "daScript/daScript.h"
-#include <filesystem>

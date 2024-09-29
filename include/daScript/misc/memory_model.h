@@ -349,9 +349,10 @@ namespace das {
 
     class LinearChunkAllocator : public ptr_ref_count {
         enum { default_initial_size = 65536 };
+        bool free_after_dispose;
     public:
-        LinearChunkAllocator() { }
-        virtual ~LinearChunkAllocator () { if ( chunk ) delete chunk; }
+        LinearChunkAllocator(bool free_after_dispose = true) : free_after_dispose(free_after_dispose){ }
+        virtual ~LinearChunkAllocator () { if ( chunk && free_after_dispose) delete chunk; }
         char * allocate ( uint32_t s );
         void free ( char * ptr, uint32_t s );
         char * reallocate ( char * ptr, uint32_t size, uint32_t nsize );

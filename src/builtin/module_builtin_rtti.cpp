@@ -895,7 +895,7 @@ namespace das {
     }
 
     void rtti_builtin_module_for_each_enumeration ( Module * module, const TBlock<void,const EnumInfo> & block, Context * context, LineInfoArg * at ) {
-        DebugInfoHelper helper;
+        DebugInfoHelper helper(false);
         helper.rtti = true;
         module->enumerations.foreach([&](auto penum){
             EnumInfo * info = helper.makeEnumDebugInfo(*penum);
@@ -962,7 +962,7 @@ namespace das {
     }
 
     void rtti_builtin_module_for_each_structure ( Module * module, const TBlock<void,const StructInfo> & block, Context * context, LineInfoArg * at ) {
-        DebugInfoHelper helper;
+        DebugInfoHelper helper(false);
         helper.rtti = true;
         module->structures.foreach([&](auto structPtr){
             StructInfo * info = helper.makeStructureDebugInfo(*structPtr);
@@ -987,7 +987,7 @@ namespace das {
     }
 
     void rtti_builtin_module_for_each_function ( Module * module, const TBlock<void,const FuncInfo> & block, Context * context, LineInfoArg * at ) {
-        DebugInfoHelper helper;
+        DebugInfoHelper helper(false);
         helper.rtti = true;
         module->functions.foreach([&](auto funcPtr){
             FuncInfo * info = helper.makeFunctionDebugInfo(*funcPtr);
@@ -999,7 +999,7 @@ namespace das {
     }
 
     void rtti_builtin_module_for_each_generic ( Module * module, const TBlock<void,const FuncInfo> & block, Context * context, LineInfoArg * at ) {
-        DebugInfoHelper helper;
+        DebugInfoHelper helper(false);
         helper.rtti = true;
         module->generics.foreach([&](auto funcPtr){
             FuncInfo * info = helper.makeFunctionDebugInfo(*funcPtr);
@@ -1011,7 +1011,7 @@ namespace das {
     }
 
     void rtti_builtin_module_for_each_global ( Module * module, const TBlock<void,const VarInfo> & block, Context * context, LineInfoArg * at ) {
-        DebugInfoHelper helper;
+        DebugInfoHelper helper(false);
         helper.rtti = true;
         module->globals.foreach([&](auto var){
             VarInfo * info = helper.makeVariableDebugInfo(*var);
@@ -1040,7 +1040,7 @@ namespace das {
 
     void rtti_builtin_basic_struct_for_each_field ( const BasicStructureAnnotation & ann,
         const TBlock<void,char *,char*,const TypeInfo,uint32_t> & block, Context * context, LineInfoArg * at ) {
-        DebugInfoHelper helper;
+        DebugInfoHelper helper(false);
         helper.rtti = true;
         for ( auto & it : ann.fields ) {
             const auto & fld = it.second;

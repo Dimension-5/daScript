@@ -1328,7 +1328,7 @@ namespace das
         void serialize( AstSerializer & ser );
     };
 
-    class MakeStruct : public das::vector<MakeFieldDeclPtr>, public ptr_ref_count {
+    class MakeStruct : public vector<MakeFieldDeclPtr>, public ptr_ref_count {
     public:
         void serialize( AstSerializer & ser );
     };

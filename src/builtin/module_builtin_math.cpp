@@ -559,6 +559,22 @@ namespace das {
         return v_quat_slerp(v_splats(t), a, b);
     }
 
+    float das_fmod_float(float l, float r) {
+        return std::fmodf(l, r);
+    }
+    float2 das_fmod_float2(float2 l, float2 r) {
+        return float2(std::fmodf(l.x, r.x), std::fmodf(l.y, r.y));
+    }
+    float3 das_fmod_float3(float3 l, float3 r) {
+        return float3(std::fmodf(l.x, r.x), std::fmodf(l.y, r.y), std::fmodf(l.z, r.z));
+    }
+    float4 das_fmod_float4(float4 l, float4 r) {
+        return float4(std::fmodf(l.x, r.x), std::fmodf(l.y, r.y), std::fmodf(l.z, r.z), std::fmodf(l.w, r.w));
+    }
+    double das_fmod(double l, double r) {
+        return std::fmodl(l, r);
+    }
+
     static void initFloatNxNIndex ( const FunctionPtr & ptr ) {
         ptr->jitOnly = true;
         ptr->arguments[0]->type->explicitConst = true;
@@ -898,6 +914,11 @@ namespace das {
                 SideEffects::none,"pack_float_to_byte")->arg("x");
             addExtern<DAS_BIND_FUN(unpack_byte_to_float)>(*this, lib, "unpack_byte_to_float",
                 SideEffects::none,"unpack_byte_to_float")->arg("x");
+            addExtern<DAS_BIND_FUN(das_fmod_float)>(*this, lib, "fmod", SideEffects::none, "das_fmod_float");
+            addExtern<DAS_BIND_FUN(das_fmod_float2)>(*this, lib, "fmod", SideEffects::none, "das_fmod_float2");
+            addExtern<DAS_BIND_FUN(das_fmod_float3)>(*this, lib, "fmod", SideEffects::none, "das_fmod_float3");
+            addExtern<DAS_BIND_FUN(das_fmod_float4)>(*this, lib, "fmod", SideEffects::none, "das_fmod_float4");
+            addExtern<DAS_BIND_FUN(das_fmod)>(*this, lib, "fmod", SideEffects::none, "das_fmod");
             // and check everything
             verifyAotReady();
         }
